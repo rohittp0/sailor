@@ -1,0 +1,50 @@
+name: release
+
+# Build cross-platform binaries and publish a GitHub Release whenever a version
+# tag (e.g. v1.0.0) is pushed.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # required to create the release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - { goos: linux, goarch: amd64 }
+          - { goos: linux, goarch: arm64 }
+          - { goos: darwin, goarch: amd64 }
+          - { goos: darwin, goarch: arm64 }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Test
+        run: go test ./...
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0"
+        run: |
+          name="sailor-${GITHUB_REF_NAME}-${GOOS}-${GOARCH}"
+          go build -trimpath -ldflags "-s -w" -o sailor ./cmd/sailor
+          tar czf "${name}.tar.gz" sailor
+          sha256sum "${name}.tar.gz" > "${name}.tar.gz.sha256"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            sailor-*.tar.gz
+            sailor-*.tar.gz.sha256
+          generate_release_notes: true
