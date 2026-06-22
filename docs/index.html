@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sailor — terminal dashboard for DigitalOcean Droplets</title>
+<meta name="description" content="Sailor is a fast, read-only terminal dashboard (TUI) for DigitalOcean Droplets — monitor live CPU, memory and disk, sort and search, view time-series charts, and SSH in. Single binary, no agent.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0b0e14">
+<meta name="author" content="rohittp0">
+<link rel="canonical" href="https://rohittp.com/sailor/">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='88'&gt;⛵&lt;/text&gt;&lt;/svg&gt;">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sailor">
+<meta property="og:title" content="Sailor — terminal dashboard for DigitalOcean Droplets">
+<meta property="og:description" content="A fast, read-only TUI for DigitalOcean Droplets: live CPU/memory/disk, search & sort, drill-down charts, and one-key SSH. Single binary, no agent.">
+<meta property="og:url" content="https://rohittp.com/sailor/">
+<meta property="og:image" content="https://rohittp.com/sailor/assets/list.png">
+<meta property="og:image:alt" content="Sailor list view showing DigitalOcean Droplets with CPU, memory and disk usage bars">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sailor — terminal dashboard for DigitalOcean Droplets">
+<meta name="twitter:description" content="A fast, read-only TUI for DigitalOcean Droplets: live CPU/memory/disk, search & sort, drill-down charts, and one-key SSH.">
+<meta name="twitter:image" content="https://rohittp.com/sailor/assets/list.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Sailor",
+  "applicationCategory": "DeveloperApplication",
+  "applicationSubCategory": "Command-line tool",
+  "operatingSystem": "macOS, Linux",
+  "description": "A fast, read-only terminal dashboard (TUI) for DigitalOcean Droplets: monitor live CPU, memory and disk usage, search and sort, view time-series charts, and SSH into any Droplet. Single static binary, no agent.",
+  "url": "https://rohittp.com/sailor/",
+  "downloadUrl": "https://github.com/rohittp0/sailor/releases/latest",
+  "softwareVersion": "0.1.0",
+  "screenshot": "https://rohittp.com/sailor/assets/list.png",
+  "softwareHelp": "https://rohittp.com/sailor/",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "rohittp0", "url": "https://github.com/rohittp0" }
+}
+</script>
+<style>
+  :root{
+    --bg:#0b0e14; --surface:#11161f; --surface2:#151b27; --border:#20283a;
+    --text:#c9d1d9; --muted:#7d8694; --accent:#3fb950; --accent2:#58a6ff;
+    --yellow:#d29922; --orange:#db8a2b; --red:#f85149;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.65;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.9em;background:var(--surface2);
+    border:1px solid var(--border);border-radius:5px;padding:.1em .4em}
+  h1,h2,h3{font-family:var(--mono);line-height:1.25;letter-spacing:-.01em}
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px}
+
+  /* nav */
+  header.nav{position:sticky;top:0;z-index:10;background:rgba(11,14,20,.85);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--mono);font-weight:700;font-size:1.15rem}
+  .brand .sail{color:var(--accent)}
+  .nav nav a{color:var(--muted);margin-left:22px;font-size:.92rem}
+  .nav nav a:hover{color:var(--text);text-decoration:none}
+
+  /* hero */
+  .hero{padding:72px 0 32px;text-align:center}
+  .hero h1{font-size:2.7rem;margin:0 0 14px}
+  .hero p.tag{font-size:1.2rem;color:var(--muted);max-width:620px;margin:0 auto 28px}
+  .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+  .btn{display:inline-block;padding:11px 20px;border-radius:8px;font-family:var(--mono);
+    font-size:.92rem;font-weight:600;border:1px solid var(--border)}
+  .btn.primary{background:var(--accent);color:#08130b;border-color:var(--accent)}
+  .btn.primary:hover{background:#4dd365;text-decoration:none}
+  .btn.ghost{background:var(--surface);color:var(--text)}
+  .btn.ghost:hover{border-color:var(--muted);text-decoration:none}
+  .pill{display:inline-flex;gap:8px;align-items:center;font-family:var(--mono);
+    font-size:.8rem;color:var(--muted);border:1px solid var(--border);
+    background:var(--surface);border-radius:999px;padding:5px 14px;margin-bottom:26px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 8px var(--accent)}
+
+  /* terminal frame */
+  .term{background:var(--surface);border:1px solid var(--border);border-radius:11px;
+    overflow:hidden;box-shadow:0 24px 60px -28px rgba(0,0,0,.8);margin:8px 0}
+  .term .bar{display:flex;align-items:center;gap:7px;padding:11px 14px;
+    background:var(--surface2);border-bottom:1px solid var(--border)}
+  .term .bar i{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .term .bar .r{background:#ff5f57}.term .bar .y{background:#febc2e}.term .bar .g{background:#28c840}
+  .term .bar span{margin-left:10px;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+  .term img{display:block;width:100%;height:auto}
+
+  /* sections */
+  section{padding:46px 0;border-top:1px solid var(--border)}
+  section h2{font-size:1.6rem;margin:0 0 8px}
+  section h2 .hash{color:var(--accent);margin-right:.4em}
+  section .lead{color:var(--muted);margin:0 0 26px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px}
+  .card h3{font-size:1.05rem;margin:0 0 8px;color:var(--text)}
+  .card h3 em{font-style:normal;color:var(--accent)}
+  .card p{margin:0;color:var(--muted);font-size:.95rem}
+
+  pre{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:.86rem;line-height:1.6}
+  pre .c{color:var(--muted)} pre .k{color:var(--accent)}
+
+  table{width:100%;border-collapse:collapse;font-size:.92rem;display:block;overflow-x:auto}
+  th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+  th{font-family:var(--mono);color:var(--muted);font-weight:600;font-size:.82rem;
+    text-transform:uppercase;letter-spacing:.05em}
+  td kbd{font-family:var(--mono);background:var(--surface2);border:1px solid var(--border);
+    border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.82rem;color:var(--text)}
+
+  .note{border-left:3px solid var(--yellow);background:var(--surface);padding:14px 18px;
+    border-radius:0 8px 8px 0;color:var(--muted);font-size:.93rem}
+  .note b{color:var(--text)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:.85rem;color:var(--muted);margin-top:14px}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  footer{padding:40px 0 60px;border-top:1px solid var(--border);color:var(--muted);
+    font-size:.9rem;text-align:center}
+  footer .brand{font-size:1rem;margin-bottom:8px}
+  @media(max-width:560px){.hero h1{font-size:2rem}.hero{padding:48px 0 20px}}
+</style>
+</head>
+<body>
+
+<header class="nav"><div class="wrap">
+  <span class="brand"><span class="sail">⛵</span> sailor</span>
+  <nav>
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+    <a href="#usage">Usage</a>
+    <a href="#refresh">How it works</a>
+    <a href="https://github.com/rohittp0/sailor">GitHub</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <span class="pill"><span class="dot"></span> read-only · single binary · no agent</span>
+    <h1>Your Droplets, in the terminal.</h1>
+    <p class="tag">A fast, read-only dashboard for DigitalOcean Droplets — live CPU,
+      memory &amp; disk, searchable and sortable, with drill-down charts and one-key SSH.</p>
+    <div class="cta">
+      <a class="btn primary" href="#install">Get started</a>
+      <a class="btn ghost" href="https://github.com/rohittp0/sailor/releases/latest">Download</a>
+    </div>
+  </div>
+
+  <div class="term">
+    <div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i>
+      <span>sailor — the Droplet list</span></div>
+    <img src="assets/list.png" alt="Sailor list view: Droplets with CPU, memory and disk usage bars">
+  </div>
+
+  <section id="features">
+    <h2><span class="hash">#</span>Features</h2>
+    <p class="lead">Everything you reach for when checking on a fleet — without opening a browser.</p>
+    <div class="grid">
+      <div class="card"><h3><em>▸</em> Live metrics</h3><p>CPU, memory and disk per Droplet with colored threshold bars that turn yellow → orange → red as load climbs.</p></div>
+      <div class="card"><h3><em>▸</em> Search &amp; sort</h3><p>Substring name filter and sort by any metric. The cursor stays pinned to its Droplet as rows re-sort live.</p></div>
+      <div class="card"><h3><em>▸</em> Drill-down charts</h3><p>Expand any Droplet into stacked CPU/mem/disk time-series over a 1h / 6h / 24h window.</p></div>
+      <div class="card"><h3><em>▸</em> One-key SSH</h3><p>Hand off to your system <code>ssh</code> for a real shell. The user and key are remembered per Droplet.</p></div>
+      <div class="card"><h3><em>▸</em> Rate-limit aware</h3><p>A cursor-windowed scheduler keeps Sailor under DigitalOcean's API limit on accounts of any size.</p></div>
+      <div class="card"><h3><em>▸</em> Instant launch</h3><p>The Droplet list is cached for a day, so the UI paints immediately while fresh data loads.</p></div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:#3fb950"></span> &lt; 50%</span>
+      <span><span class="sw" style="background:#d29922"></span> 50–75%</span>
+      <span><span class="sw" style="background:#db8a2b"></span> 75–90%</span>
+      <span><span class="sw" style="background:#f85149"></span> ≥ 90%</span>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2><span class="hash">#</span>Install</h2>
+    <p class="lead">Grab a prebuilt binary, or build from source with Go 1.26+.</p>
+    <pre><span class="c"># macOS (Apple Silicon)</span>
+curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-v0.1.0-darwin-arm64.tar.gz | tar xz
+
+<span class="c"># Linux (x86-64)</span>
+curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-v0.1.0-linux-amd64.tar.gz | tar xz
+
+./sailor</pre>
+    <p style="color:var(--muted);font-size:.92rem">Binaries are published for macOS and Linux on <code>amd64</code> and <code>arm64</code>. To build from source:</p>
+    <pre>git clone https://github.com/rohittp0/sailor.git
+cd sailor
+go build -o sailor ./cmd/sailor</pre>
+  </section>
+
+  <section id="usage">
+    <h2><span class="hash">#</span>Usage</h2>
+    <p class="lead">Sailor needs a DigitalOcean API token <b>with the Monitoring read scope</b>.</p>
+    <p style="color:var(--muted)">The token is resolved from the <code>DIGITALOCEAN_ACCESS_TOKEN</code> environment variable, falling back to your existing <code>doctl</code> configuration.</p>
+    <pre>export DIGITALOCEAN_ACCESS_TOKEN=dop_v1_xxx
+sailor
+
+<span class="c"># …or, if doctl is already authenticated:</span>
+sailor</pre>
+    <div class="note"><b>Why some cells show <code>n/a</code>:</b> DigitalOcean always exposes CPU, but
+      memory and disk usage require the metrics agent (<code>do-agent</code>) on the Droplet.
+      Droplets without it show CPU only; powered-off Droplets show <code>--</code>.</div>
+
+    <h3 style="margin-top:34px">Keybindings</h3>
+    <table>
+      <tr><th>Key</th><th>Action</th></tr>
+      <tr><td><kbd>j</kbd> <kbd>k</kbd> <kbd>↑</kbd> <kbd>↓</kbd></td><td>Move cursor</td></tr>
+      <tr><td><kbd>g</kbd> / <kbd>G</kbd></td><td>Jump to top / bottom</td></tr>
+      <tr><td><kbd>ctrl+d</kbd> / <kbd>ctrl+u</kbd></td><td>Page down / up</td></tr>
+      <tr><td><kbd>/</kbd></td><td>Filter by name (<kbd>esc</kbd> clears)</td></tr>
+      <tr><td><kbd>N</kbd> <kbd>C</kbd> <kbd>M</kbd> <kbd>D</kbd></td><td>Sort by name / CPU / memory / disk</td></tr>
+      <tr><td><kbd>enter</kbd> / <kbd>e</kbd></td><td>Expand to charts</td></tr>
+      <tr><td><kbd>s</kbd> / <kbd>S</kbd></td><td>SSH / edit SSH profile</td></tr>
+      <tr><td><kbd>r</kbd></td><td>Refresh all</td></tr>
+      <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td>Chart window 1h / 6h / 24h (expanded view)</td></tr>
+      <tr><td><kbd>esc</kbd></td><td>Back to the list</td></tr>
+      <tr><td><kbd>?</kbd></td><td>Toggle help</td></tr>
+      <tr><td><kbd>q</kbd></td><td>Quit</td></tr>
+    </table>
+  </section>
+
+  <section id="detail">
+    <h2><span class="hash">#</span>Expanded view</h2>
+    <p class="lead">Press <kbd style="font-family:var(--mono)">enter</kbd> on a Droplet for stacked CPU / memory / disk charts.
+      The time window is global and persists across Droplets.</p>
+    <div class="term">
+      <div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i>
+        <span>sailor — expanded charts</span></div>
+      <img src="assets/detail.png" alt="Sailor expanded view: stacked CPU, memory and disk time-series charts">
+    </div>
+    <h3 style="margin-top:30px">SSH</h3>
+    <p style="color:var(--muted)">Press <kbd style="font-family:var(--mono)">s</kbd> to connect. The first time, a prompt asks for the login user
+      (default <code>root</code>) and identity-file path; the choice is saved per Droplet in
+      <code>~/.config/sailor/hosts.toml</code> — <b>paths only, no secrets</b> — and reused afterward.
+      Sailor execs your system <code>ssh</code>, inheriting your keys, agent and <code>~/.ssh/config</code>.</p>
+  </section>
+
+  <section id="refresh">
+    <h2><span class="hash">#</span>How it stays under the rate limit</h2>
+    <p class="lead">DigitalOcean allows ~5,000 requests/hour, and each fully-populated row costs three metric calls.</p>
+    <p style="color:var(--muted)">Sailor fetches <b>all</b> stats once at launch so the initial sort is correct, then settles
+      into a <b>cursor-centered window</b> of up to ~23 active Droplets per minute. Off-screen rows keep
+      their last value (dimmed) and refresh as you scroll to them. The expanded view pauses the list and
+      polls just that one Droplet every 5 seconds.</p>
+    <p style="color:var(--muted)">The full design — including why the list re-sorts live and how the
+      budget is spent — is recorded in
+      <a href="adr/0002-rate-limit-budgeted-refresh.md">ADR-0002</a>.
+      Sailor is <b>read-only by design</b>: it observes and connects, but never powers off, reboots,
+      resizes, or destroys Droplets.</p>
+  </section>
+
+</main>
+
+<footer><div class="wrap">
+  <div class="brand"><span style="color:var(--accent)">⛵</span> sailor</div>
+  <div>A read-only terminal dashboard for DigitalOcean Droplets ·
+    <a href="https://github.com/rohittp0/sailor">source</a> ·
+    <a href="https://github.com/rohittp0/sailor/releases">releases</a></div>
+</div></footer>
+
+</body>
+</html>
