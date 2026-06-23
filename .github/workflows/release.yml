@@ -1,7 +1,8 @@
 name: release
 
 # Build cross-platform binaries and publish a GitHub Release whenever a version
-# tag (e.g. v1.0.0) is pushed.
+# tag (e.g. v1.0.0) is pushed. Builds run in parallel; a single downstream job
+# publishes the release so there is no race on the release object.
 on:
   push:
     tags:
@@ -14,6 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - { goos: linux, goarch: amd64 }
@@ -42,10 +44,22 @@ jobs:
           tar czf "${name}.tar.gz" sailor
           sha256sum "${name}.tar.gz" > "${name}.tar.gz.sha256"
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: sailor-*.tar.gz*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            sailor-*.tar.gz
-            sailor-*.tar.gz.sha256
+          files: dist/*
           generate_release_notes: true
