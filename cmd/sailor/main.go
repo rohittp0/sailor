@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/rohittp0/sailor/internal/config"
@@ -11,12 +12,23 @@ import (
 	"github.com/rohittp0/sailor/internal/ui"
 )
 
-// version is set at build time via -ldflags "-X main.version=...".
+// version is set at build time via -ldflags "-X main.version=...". For
+// `go install`ed binaries it falls back to the module version from build info.
 var version = "dev"
+
+func resolveVersion() string {
+	if version != "dev" {
+		return version
+	}
+	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
+		return info.Main.Version
+	}
+	return version
+}
 
 func main() {
 	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
-		fmt.Println("sailor", version)
+		fmt.Println("sailor", resolveVersion())
 		return
 	}
 
