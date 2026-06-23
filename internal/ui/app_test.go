@@ -3,8 +3,8 @@ package ui
 import (
 	"testing"
 
-	"sailor/internal/do"
-	"sailor/internal/sched"
+	"github.com/rohittp0/sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/sched"
 )
 
 func TestWindowDropletsCapsAndExcludesOff(t *testing.T) {

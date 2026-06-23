@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 // Color palette (btop-style thresholds).

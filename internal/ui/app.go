@@ -11,9 +11,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/digitalocean/godo/metrics"
-	"sailor/internal/config"
-	"sailor/internal/do"
-	"sailor/internal/sched"
+	"github.com/rohittp0/sailor/internal/config"
+	"github.com/rohittp0/sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/sched"
 )
 
 // refreshInterval is the list poll cadence (M2: naive, all active Droplets).

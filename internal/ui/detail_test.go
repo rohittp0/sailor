@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 func sampleSeries(now time.Time) do.Series {

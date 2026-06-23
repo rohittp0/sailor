@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/digitalocean/godo/metrics"
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 // runProbe dumps raw metric responses for the first few active Droplets so we

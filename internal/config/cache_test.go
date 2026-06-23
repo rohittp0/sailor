@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 func TestDropletCacheRoundTrip(t *testing.T) {

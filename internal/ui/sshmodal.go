@@ -8,8 +8,8 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"sailor/internal/config"
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/config"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 type sshAction int

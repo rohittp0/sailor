@@ -26,19 +26,27 @@ Grab a prebuilt binary from the [latest release](https://github.com/rohittp0/sai
 
 ```bash
 # macOS (Apple Silicon)
-curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-v0.1.0-darwin-arm64.tar.gz | tar xz
+curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-darwin-arm64.tar.gz | tar xz
 
 # Linux (x86-64)
-curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-v0.1.0-linux-amd64.tar.gz | tar xz
+curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-linux-amd64.tar.gz | tar xz
 
 ./sailor
 ```
 
 Binaries are published for macOS and Linux on both `amd64` and `arm64`.
 
-### Build from source
+### Go install
 
-Requires Go 1.26+.
+With Go 1.26+ on your `PATH`:
+
+```bash
+go install github.com/rohittp0/sailor/cmd/sailor@latest
+```
+
+This drops the `sailor` binary in `$(go env GOPATH)/bin`.
+
+### Build from source
 
 ```bash
 git clone https://github.com/rohittp0/sailor.git

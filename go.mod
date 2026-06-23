@@ -1,4 +1,4 @@
-module sailor
+module github.com/rohittp0/sailor
 
 go 1.26
 

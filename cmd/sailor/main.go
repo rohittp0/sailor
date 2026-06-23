@@ -6,12 +6,20 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"sailor/internal/config"
-	"sailor/internal/do"
-	"sailor/internal/ui"
+	"github.com/rohittp0/sailor/internal/config"
+	"github.com/rohittp0/sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/ui"
 )
 
+// version is set at build time via -ldflags "-X main.version=...".
+var version = "dev"
+
 func main() {
+	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
+		fmt.Println("sailor", version)
+		return
+	}
+
 	tok, err := config.Token()
 	if errors.Is(err, config.ErrNoToken) {
 		fmt.Fprintf(os.Stderr,

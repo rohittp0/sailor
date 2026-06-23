@@ -8,7 +8,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 type sortCol int

@@ -190,13 +190,16 @@
     <h2><span class="hash">#</span>Install</h2>
     <p class="lead">Grab a prebuilt binary, or build from source with Go 1.26+.</p>
     <pre><span class="c"># macOS (Apple Silicon)</span>
-curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-v0.1.0-darwin-arm64.tar.gz | tar xz
+curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-darwin-arm64.tar.gz | tar xz
 
 <span class="c"># Linux (x86-64)</span>
-curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-v0.1.0-linux-amd64.tar.gz | tar xz
+curl -L https://github.com/rohittp0/sailor/releases/latest/download/sailor-linux-amd64.tar.gz | tar xz
 
 ./sailor</pre>
-    <p style="color:var(--muted);font-size:.92rem">Binaries are published for macOS and Linux on <code>amd64</code> and <code>arm64</code>. To build from source:</p>
+    <p style="color:var(--muted);font-size:.92rem">Binaries are published for macOS and Linux on <code>amd64</code> and <code>arm64</code>.</p>
+    <p style="color:var(--muted);font-size:.92rem">Or install with Go 1.26+:</p>
+    <pre><span class="k">go</span> install github.com/rohittp0/sailor/cmd/sailor@latest</pre>
+    <p style="color:var(--muted);font-size:.92rem">…or build from source:</p>
     <pre>git clone https://github.com/rohittp0/sailor.git
 cd sailor
 go build -o sailor ./cmd/sailor</pre>

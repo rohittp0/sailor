@@ -6,7 +6,7 @@ import (
 
 	"github.com/NimbleMarkets/ntcharts/linechart/timeserieslinechart"
 	"github.com/charmbracelet/lipgloss"
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 // detailModel is the full-screen expanded view: three stacked time-series

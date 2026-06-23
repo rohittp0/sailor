@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"sailor/internal/config"
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/config"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 func key(t tea.KeyType) tea.KeyMsg { return tea.KeyMsg{Type: t} }

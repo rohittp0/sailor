@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 // DropletCacheTTL is how long a cached Droplet list is trusted for an instant

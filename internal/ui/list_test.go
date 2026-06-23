@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"sailor/internal/do"
+	"github.com/rohittp0/sailor/internal/do"
 )
 
 func active(cpu float64) do.Usage {

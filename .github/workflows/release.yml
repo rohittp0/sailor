@@ -36,8 +36,9 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "0"
         run: |
-          name="sailor-${GITHUB_REF_NAME}-${GOOS}-${GOARCH}"
-          go build -trimpath -ldflags "-s -w" -o sailor ./cmd/sailor
+          # Version-less asset names so /releases/latest/download/<name> permalinks are stable.
+          name="sailor-${GOOS}-${GOARCH}"
+          go build -trimpath -ldflags "-s -w -X main.version=${GITHUB_REF_NAME}" -o sailor ./cmd/sailor
           tar czf "${name}.tar.gz" sailor
           sha256sum "${name}.tar.gz" > "${name}.tar.gz.sha256"
 
