@@ -2,11 +2,13 @@ package ui
 
 import (
 	"context"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -106,6 +108,16 @@ type Model struct {
 	ssh      sshModal
 	sshErr   string // transient (e.g. droplet has no public IP)
 	helpOpen bool
+
+	scpOpen      bool            // file picker visible
+	scpPending   bool            // open the picker (not connect) after the SSH modal saves creds
+	picker       filePickerModel // the file/folder chooser
+	scpUploading bool            // a transfer is in flight
+	scpTarget    do.Droplet      // droplet being uploaded to (for the progress overlay)
+	scpBar       progress.Model
+	scpProg      scpProgress
+	scpCh        chan tea.Msg // progress/finished events from the transfer goroutine
+	scpErr       string       // last upload error, surfaced in the footer
 }
 
 // New builds the root model around a data-layer API and the SSH profile store.
@@ -406,6 +418,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case scpProgressMsg:
+		m.scpProg = scpProgress(msg)
+		return m, waitForScpEvent(m.scpCh)
+
+	case scpFinishedMsg:
+		m.scpUploading = false
+		m.scpCh = nil
+		if msg.err != nil {
+			m.scpErr = "scp: " + msg.err.Error()
+		}
+		return m, nil
+
 	case tickMsg:
 		if m.state == viewDetail || !m.initialized {
 			// List hidden, or the initial full load is still running — keep the
@@ -483,6 +507,15 @@ func (m Model) handleEvent(ev refreshEvent) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	if m.scpUploading { // transfer in progress: only allow a hard quit
+		if msg.String() == keyQuitCtrl {
+			return m, tea.Quit
+		}
+		return m, nil
+	}
+	if m.scpOpen {
+		return m.handleSCPKey(msg)
+	}
 	if m.sshOpen {
 		return m.handleSSHKey(msg)
 	}
@@ -561,6 +594,8 @@ func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m.startSSH(false)
 	case keySSHEdit:
 		return m.startSSH(true)
+	case keySCP:
+		return m.startSCP()
 	case keyRefresh:
 		m.initialized = false // re-fetch all stats, not just the window
 		m2, cmd := m.startRefresh()
@@ -582,6 +617,8 @@ func (m Model) handleDetailKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m.startSSH(false)
 	case keySSHEdit:
 		return m.startSSH(true)
+	case keySCP:
+		return m.startSCP()
 	case "1", "2", "3":
 		windows := map[string]time.Duration{"1": time.Hour, "2": 6 * time.Hour, "3": 24 * time.Hour}
 		m.window = windows[msg.String()]
@@ -644,7 +681,70 @@ func (m Model) handleSSHKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.sshOpen = false
+		if m.scpPending { // creds captured for an upload: open the picker, don't connect
+			m.scpPending = false
+			return m.openPicker(d)
+		}
 		return m, sshConnectCmd(d, p)
+	}
+	return m, cmd
+}
+
+// startSCP begins an SCP upload to the current Droplet. It reuses the Droplet's
+// stored Connection Profile; if none exists yet it prompts the SSH modal to
+// capture one, then opens the file picker.
+func (m Model) startSCP() (tea.Model, tea.Cmd) {
+	d, ok := m.currentDroplet()
+	if !ok {
+		return m, nil
+	}
+	if d.PublicIP == "" {
+		m.scpErr = "no public IPv4 for " + d.Name
+		return m, nil
+	}
+	m.scpErr = ""
+	p, have := m.hosts.Get(d.ID)
+	if have {
+		return m.openPicker(d)
+	}
+	m.scpPending = true
+	m.sshOpen = true
+	m.ssh = newSSHModal(d, p)
+	return m, textinput.Blink
+}
+
+// openPicker opens the file/folder chooser at the directory sailor was launched
+// from (falling back to root if that can't be determined).
+func (m Model) openPicker(d do.Droplet) (tea.Model, tea.Cmd) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		cwd = string(os.PathSeparator)
+	}
+	m.scpOpen = true
+	m.picker = newFilePickerModel(cwd, d)
+	return m, nil
+}
+
+// handleSCPKey drives the file picker and, on confirm, starts the transfer.
+func (m Model) handleSCPKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	var act fpAction
+	var cmd tea.Cmd
+	m.picker, act, cmd = m.picker.update(msg)
+	switch act {
+	case fpCancel:
+		m.scpOpen = false
+		return m, nil
+	case fpUpload:
+		paths := m.picker.selectedPaths()
+		d := m.picker.d
+		p, _ := m.hosts.Get(d.ID)
+		m.scpOpen = false
+		m.scpUploading = true
+		m.scpTarget = d
+		m.scpProg = scpProgress{}
+		m.scpBar = progress.New(progress.WithDefaultGradient())
+		m.scpCh = make(chan tea.Msg, 64)
+		return m, startScpCmd(m.scpCh, d, p, paths)
 	}
 	return m, cmd
 }
@@ -669,6 +769,12 @@ func (m Model) View() string {
 	if m.sshOpen {
 		return m.ssh.view(m.width, m.height)
 	}
+	if m.scpUploading {
+		return scpProgressView(m.scpBar, m.scpTarget, m.scpProg, m.width, m.height)
+	}
+	if m.scpOpen {
+		return m.picker.view(m.width, m.height)
+	}
 	if m.state == viewDetail {
 		return m.detail.view(m.window, time.Now())
 	}
@@ -685,6 +791,9 @@ func (m Model) View() string {
 	out := m.list.view(time.Now())
 	if m.sshErr != "" {
 		out += "\n" + lipgloss.NewStyle().Foreground(colRed).Render(m.sshErr)
+	}
+	if m.scpErr != "" {
+		out += "\n" + lipgloss.NewStyle().Foreground(colRed).Render(m.scpErr)
 	}
 	if m.metricErr != "" {
 		out += "\n" + lipgloss.NewStyle().Foreground(colOrange).Render(m.metricErr)

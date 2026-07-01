@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sailor — terminal dashboard for DigitalOcean Droplets</title>
-<meta name="description" content="Sailor is a fast, read-only terminal dashboard (TUI) for DigitalOcean Droplets — monitor live CPU, memory and disk, sort and search, view time-series charts, and SSH in. Single binary, no agent.">
+<meta name="description" content="Sailor is a fast terminal dashboard (TUI) for DigitalOcean Droplets — monitor live CPU, memory and disk, sort and search, view time-series charts, SSH in, and SCP files up. Single binary, no agent.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#0b0e14">
 <meta name="author" content="rohittp0">
@@ -34,10 +34,10 @@
   "applicationCategory": "DeveloperApplication",
   "applicationSubCategory": "Command-line tool",
   "operatingSystem": "macOS, Linux",
-  "description": "A fast, read-only terminal dashboard (TUI) for DigitalOcean Droplets: monitor live CPU, memory and disk usage, search and sort, view time-series charts, and SSH into any Droplet. Single static binary, no agent.",
+  "description": "A fast terminal dashboard (TUI) for DigitalOcean Droplets: monitor live CPU, memory and disk usage, search and sort, view time-series charts, SSH into any Droplet, and SCP files up to it. Single static binary, no agent.",
   "url": "https://rohittp.com/sailor/",
   "downloadUrl": "https://github.com/rohittp0/sailor/releases/latest",
-  "softwareVersion": "0.1.0",
+  "softwareVersion": "0.2.0",
   "screenshot": "https://rohittp.com/sailor/assets/list.png",
   "softwareHelp": "https://rohittp.com/sailor/",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
@@ -153,8 +153,8 @@
   <div class="hero">
     <span class="pill"><span class="dot"></span> read-only · single binary · no agent</span>
     <h1>Your Droplets, in the terminal.</h1>
-    <p class="tag">A fast, read-only dashboard for DigitalOcean Droplets — live CPU,
-      memory &amp; disk, searchable and sortable, with drill-down charts and one-key SSH.</p>
+    <p class="tag">A fast dashboard for DigitalOcean Droplets — live CPU,
+      memory &amp; disk, searchable and sortable, with drill-down charts, one-key SSH, and SCP upload.</p>
     <div class="cta">
       <a class="btn primary" href="#install">Get started</a>
       <a class="btn ghost" href="https://github.com/rohittp0/sailor/releases/latest">Download</a>
@@ -175,6 +175,7 @@
       <div class="card"><h3><em>▸</em> Search &amp; sort</h3><p>Substring name filter and sort by any metric. The cursor stays pinned to its Droplet as rows re-sort live.</p></div>
       <div class="card"><h3><em>▸</em> Drill-down charts</h3><p>Expand any Droplet into stacked CPU/mem/disk time-series over a 1h / 6h / 24h window.</p></div>
       <div class="card"><h3><em>▸</em> One-key SSH</h3><p>Hand off to your system <code>ssh</code> for a real shell. The user and key are remembered per Droplet.</p></div>
+      <div class="card"><h3><em>▸</em> SCP upload</h3><p>Pick local files/folders in a multi-select browser and send them to the Droplet's home directory, with a live progress bar.</p></div>
       <div class="card"><h3><em>▸</em> Rate-limit aware</h3><p>A cursor-windowed scheduler keeps Sailor under DigitalOcean's API limit on accounts of any size.</p></div>
       <div class="card"><h3><em>▸</em> Instant launch</h3><p>The Droplet list is cached for a day, so the UI paints immediately while fresh data loads.</p></div>
     </div>
@@ -228,6 +229,7 @@ sailor</pre>
       <tr><td><kbd>N</kbd> <kbd>C</kbd> <kbd>M</kbd> <kbd>D</kbd></td><td>Sort by name / CPU / memory / disk</td></tr>
       <tr><td><kbd>enter</kbd> / <kbd>e</kbd></td><td>Expand to charts</td></tr>
       <tr><td><kbd>s</kbd> / <kbd>S</kbd></td><td>SSH / edit SSH profile</td></tr>
+      <tr><td><kbd>u</kbd></td><td>Upload files/folders (SCP)</td></tr>
       <tr><td><kbd>r</kbd></td><td>Refresh all</td></tr>
       <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td>Chart window 1h / 6h / 24h (expanded view)</td></tr>
       <tr><td><kbd>esc</kbd></td><td>Back to the list</td></tr>
@@ -250,6 +252,14 @@ sailor</pre>
       (default <code>root</code>) and identity-file path; the choice is saved per Droplet in
       <code>~/.config/sailor/hosts.toml</code> — <b>paths only, no secrets</b> — and reused afterward.
       Sailor execs your system <code>ssh</code>, inheriting your keys, agent and <code>~/.ssh/config</code>.</p>
+
+    <h3 style="margin-top:30px">SCP upload</h3>
+    <p style="color:var(--muted)">Press <kbd style="font-family:var(--mono)">u</kbd> to upload local files or folders to a Droplet's home
+      directory. A terminal file browser opens at your current directory — <kbd style="font-family:var(--mono)">l</kbd>/<kbd style="font-family:var(--mono)">h</kbd>
+      navigate in and out of folders, <kbd style="font-family:var(--mono)">space</kbd> checks items across directories,
+      <kbd style="font-family:var(--mono)">/</kbd> filters, <kbd style="font-family:var(--mono)">.</kbd> toggles hidden files — then
+      <kbd style="font-family:var(--mono)">enter</kbd> sends everything selected, with a live progress bar. Selecting a folder
+      subsumes anything checked inside it. The upload reuses the saved SSH login and runs your system <code>scp</code>.</p>
   </section>
 
   <section id="refresh">
@@ -262,8 +272,9 @@ sailor</pre>
     <p style="color:var(--muted)">The full design — including why the list re-sorts live and how the
       budget is spent — is recorded in
       <a href="adr/0002-rate-limit-budgeted-refresh.md">ADR-0002</a>.
-      Sailor is <b>read-only by design</b>: it observes and connects, but never powers off, reboots,
-      resizes, or destroys Droplets.</p>
+      Sailor is <b>read-only against your DigitalOcean account by design</b>: it observes and connects, but never powers off,
+      reboots, resizes, or destroys Droplets through the API. The SSH and SCP hand-offs act inside a server you already
+      control (an upload writes files there), not on the control plane.</p>
   </section>
 
 </main>

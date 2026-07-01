@@ -20,6 +20,7 @@ const (
 	keyExpandAlt = "e"
 	keySSH       = "s"
 	keySSHEdit   = "S"
+	keySCP       = "u"
 	keyRefresh   = "r"
 	keyHelp      = "?"
 	keyQuit      = "q"
@@ -28,10 +29,10 @@ const (
 )
 
 // footerHint is the persistent key bar shown under the list.
-const footerHint = "?·help  /·filter  N/C/M/D·sort  enter·expand  s·ssh  r·refresh  q·quit"
+const footerHint = "?·help  /·filter  N/C/M/D·sort  enter·expand  s·ssh  u·upload  r·refresh  q·quit"
 
 // detailFooterHint is the key bar shown under the expanded view.
-const detailFooterHint = "1/2/3·window  s·ssh  esc·back  ?·help  q·quit"
+const detailFooterHint = "1/2/3·window  s·ssh  u·upload  esc·back  ?·help  q·quit"
 
 // helpEntry is one keybinding row in the help overlay.
 type helpEntry struct{ keys, desc string }
@@ -50,11 +51,13 @@ var helpSections = []struct {
 		{"N / C / M / D", "sort by name / cpu / mem / disk"},
 		{"enter", "expand to charts"},
 		{"s / S", "ssh / edit ssh profile"},
+		{"u", "upload files (scp)"},
 		{"r", "refresh all"},
 	}},
 	{"Detail", []helpEntry{
 		{"1 / 2 / 3", "window 1h / 6h / 24h"},
 		{"s", "ssh"},
+		{"u", "upload files (scp)"},
 		{"esc", "back to list"},
 	}},
 	{"General", []helpEntry{

@@ -1,6 +1,6 @@
 # Sailor
 
-A read-only terminal dashboard for a user's DigitalOcean account: lists Droplets with their resource Metrics, lets you search/sort, expand a Droplet to see metric charts, and SSH into a selected Droplet. Read-only — it never mutates account or Droplet state.
+A terminal dashboard for a user's DigitalOcean account: lists Droplets with their resource Metrics, lets you search/sort, expand a Droplet to see metric charts, SSH into a selected Droplet, and SCP upload local files/folders to it. **Read-only against the DigitalOcean control plane** — it never powers off, reboots, resizes, or destroys Droplets, nor mutates account state via the DO API. SSH and SCP are exec hand-offs that operate *inside* a server the user already controls; they are not control-plane operations.
 
 ## Language
 
@@ -15,7 +15,10 @@ DigitalOcean's monitoring agent installed on a Droplet. CPU is always available 
 _Avoid_: "monitoring" (ambiguous with the broader DO Monitoring product)
 
 **Connection Profile**:
-The remembered SSH settings for a Droplet — its login user and identity-file path — captured on first SSH and reused (no re-prompt) on every later SSH. Stored locally keyed by Droplet ID. Holds the key *path*, never key material, so it contains no secrets. Editable/re-promptable per Droplet.
+The remembered SSH settings for a Droplet — its login user and identity-file path — captured on first SSH and reused (no re-prompt) on every later SSH. **Shared by SSH and SCP**: an upload reuses the same profile, and if none exists yet the SSH prompt captures it first. Stored locally keyed by Droplet ID. Holds the key *path*, never key material, so it contains no secrets. Editable/re-promptable per Droplet.
+
+**Upload** (SCP):
+Copying one or more locally-chosen files/folders to the selected Droplet's home directory (`user@ip:`) via the system `scp` binary. The user picks entries in a terminal file/folder chooser (multi-select, cross-directory); nested selections collapse (a selected folder subsumes any separately-selected child). Upload-only, home-directory-only in v1. Writes *inside* the server, not to the DO control plane — see the read-only note above.
 
 ## Relationships
 
