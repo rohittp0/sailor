@@ -1,21 +1,21 @@
 # ⛵ Sailor
 
-A fast **terminal dashboard for your DigitalOcean Droplets**. List every Droplet with live CPU / memory / disk usage, search and sort, expand any Droplet into full time-series charts, SSH straight into one, and SCP files up to it — all without leaving the terminal.
+Sailor is a terminal UI for watching your DigitalOcean Droplets. It shows live CPU, memory, and disk for each one, lets you sort and filter the list, opens usage charts for any Droplet, and hands off to `ssh` or `scp` when you need to get onto a box or push files to it.
 
 ![Sailor list view](docs/assets/list.png)
 
-Sailor collapses the round-trip between the DigitalOcean web console (for metrics) and your terminal (for SSH) into a single static binary.
+It's one binary. The idea is to stop bouncing between the DigitalOcean console (for metrics) and a terminal (for SSH).
 
-## Features
+## What it does
 
-- **Live metrics list** — CPU, memory and disk usage per Droplet, with colored threshold bars (green → yellow → orange → red).
-- **Search & sort** — substring name filter (`/`) and sort by name / CPU / memory / disk; the cursor stays pinned to its Droplet as rows re-sort live.
-- **Expandable charts** — drill into any Droplet for stacked CPU/mem/disk braille time-series over a 1h / 6h / 24h window.
-- **One-key SSH** — hand off to your system `ssh` for a real shell; the login user and key are remembered per Droplet.
-- **SCP upload** — pick local files/folders in a built-in multi-select file browser and send them to the Droplet's home directory, with a live progress bar. Reuses the saved SSH login.
-- **Rate-limit aware** — a cursor-windowed refresh scheduler stays under DigitalOcean's API limit on accounts of any size.
-- **Instant launch** — the Droplet list is cached for a day, so the UI paints immediately while fresh data loads in the background.
-- **Single binary** — no agent, no server, no browser. Read-only: it never mutates your account.
+- **Live usage** — CPU, memory, and disk per Droplet. Bars run from green through yellow and orange to red as load climbs.
+- **Search and sort** — filter by name with `/`; sort by name, CPU, memory, or disk. The cursor stays on the same Droplet while the list re-sorts around it.
+- **Charts** — press `enter` on a Droplet to see its CPU/memory/disk history as braille time-series, over the last 1h, 6h, or 24h.
+- **SSH** — press `s` to drop into a shell. Sailor runs your system `ssh`, so your keys, agent, and `~/.ssh/config` all apply; the login is remembered per Droplet.
+- **SCP** — press `u` to pick files or folders in a small browser and upload them to the Droplet's home directory. A progress bar tracks the transfer.
+- **Kind to the rate limit** — DigitalOcean allows ~5,000 API calls/hour and each row costs three. Sailor only refreshes the Droplets near your cursor, so it holds up whether you run five or five hundred.
+- **Quick to start** — the list is cached, so it's on screen right away while fresh numbers load behind it.
+- **Read-only** — Sailor never changes your account through the API (no power, reboot, resize, or destroy). SSH and SCP act inside a server you already control.
 
 > **Note on metrics:** DigitalOcean always exposes CPU, but **memory and disk usage require the [metrics agent](https://docs.digitalocean.com/products/monitoring/how-to/install-metrics-agent/) (`do-agent`)** on the Droplet. Droplets without it show CPU only (memory/disk as `n/a`); powered-off Droplets show `--`.
 
@@ -101,7 +101,7 @@ Press `s` on a Droplet to connect. The first time, a small prompt asks for the l
 
 ### SCP upload
 
-Press `u` on a Droplet to upload local files or folders to its home directory. A terminal file browser opens at your current directory — navigate with `l`/`→` (into a folder), `h`/`←` (up), `space` to check items (across directories), `/` to filter, `.` to toggle hidden files — then `enter` to send everything selected. Selecting a folder *and* something inside it just sends the folder. A styled progress bar shows the transfer live. The upload reuses the Droplet's saved SSH login (prompting for it first if you haven't connected yet). It runs the system `scp` binary non-interactively, so uploads never mutate your DigitalOcean account — they only write files onto a server you already reach over SSH.
+Press `u` on a Droplet to send local files up to it. A file browser opens where you launched Sailor; move around with `l`/`h`, check things with `space` (you can grab files from more than one folder along the way), then press `enter` to upload the lot to the remote home directory. Check a folder and something inside it and Sailor just sends the folder. Uploads reuse the login you saved for SSH — if you haven't connected to that Droplet yet, it asks for the user and key first. Underneath it's your system `scp`, run non-interactively, writing only to a server you already reach over SSH.
 
 ## How it stays under the rate limit
 
@@ -115,4 +115,4 @@ DigitalOcean allows ~5,000 API requests/hour and each fully-populated row costs 
 
 ## Scope
 
-Sailor is **read-only against your DigitalOcean account by design** — it observes and connects, but never powers off, reboots, resizes, or destroys Droplets through the DO API. The SSH and SCP hand-offs act *inside* a server you already control (SCP upload writes files there), not on the control plane. That keeps it safe to run against a production account.
+Sailor stays read-only where it counts: it never powers off, reboots, resizes, or destroys Droplets, and makes no changes to your account through the DigitalOcean API. SSH and SCP work inside a server you already have access to — an upload writes files there — but neither touches the control plane. It's safe to point at a production account.

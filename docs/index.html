@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sailor — terminal dashboard for DigitalOcean Droplets</title>
-<meta name="description" content="Sailor is a fast terminal dashboard (TUI) for DigitalOcean Droplets — monitor live CPU, memory and disk, sort and search, view time-series charts, SSH in, and SCP files up. Single binary, no agent.">
+<meta name="description" content="Sailor is a terminal dashboard (TUI) for DigitalOcean Droplets: live CPU, memory and disk, search, sort, usage charts, SSH and SCP. One binary, no agent.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#0b0e14">
 <meta name="author" content="rohittp0">
@@ -15,15 +15,17 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sailor">
 <meta property="og:title" content="Sailor — terminal dashboard for DigitalOcean Droplets">
-<meta property="og:description" content="A fast, read-only TUI for DigitalOcean Droplets: live CPU/memory/disk, search & sort, drill-down charts, and one-key SSH. Single binary, no agent.">
+<meta property="og:description" content="A terminal TUI for DigitalOcean Droplets: live CPU/memory/disk, search & sort, usage charts, SSH, and SCP file uploads. One binary, no agent.">
 <meta property="og:url" content="https://rohittp.com/sailor/">
 <meta property="og:image" content="https://rohittp.com/sailor/assets/list.png">
+<meta property="og:image:width" content="1894">
+<meta property="og:image:height" content="1156">
 <meta property="og:image:alt" content="Sailor list view showing DigitalOcean Droplets with CPU, memory and disk usage bars">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Sailor — terminal dashboard for DigitalOcean Droplets">
-<meta name="twitter:description" content="A fast, read-only TUI for DigitalOcean Droplets: live CPU/memory/disk, search & sort, drill-down charts, and one-key SSH.">
+<meta name="twitter:description" content="A terminal TUI for DigitalOcean Droplets: live CPU/memory/disk, search & sort, usage charts, SSH, and SCP file uploads.">
 <meta name="twitter:image" content="https://rohittp.com/sailor/assets/list.png">
 
 <script type="application/ld+json">
@@ -38,8 +40,11 @@
   "url": "https://rohittp.com/sailor/",
   "downloadUrl": "https://github.com/rohittp0/sailor/releases/latest",
   "softwareVersion": "0.2.0",
+  "image": "https://rohittp.com/sailor/assets/list.png",
   "screenshot": "https://rohittp.com/sailor/assets/list.png",
   "softwareHelp": "https://rohittp.com/sailor/",
+  "codeRepository": "https://github.com/rohittp0/sailor",
+  "sameAs": "https://github.com/rohittp0/sailor",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Person", "name": "rohittp0", "url": "https://github.com/rohittp0" }
 }
@@ -153,8 +158,8 @@
   <div class="hero">
     <span class="pill"><span class="dot"></span> read-only · single binary · no agent</span>
     <h1>Your Droplets, in the terminal.</h1>
-    <p class="tag">A fast dashboard for DigitalOcean Droplets — live CPU,
-      memory &amp; disk, searchable and sortable, with drill-down charts, one-key SSH, and SCP upload.</p>
+    <p class="tag">Watch your DigitalOcean Droplets from the terminal: live CPU,
+      memory, and disk, sortable and searchable, with usage charts, SSH, and file uploads over SCP.</p>
     <div class="cta">
       <a class="btn primary" href="#install">Get started</a>
       <a class="btn ghost" href="https://github.com/rohittp0/sailor/releases/latest">Download</a>
@@ -164,20 +169,23 @@
   <div class="term">
     <div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i>
       <span>sailor — the Droplet list</span></div>
-    <img src="assets/list.png" alt="Sailor list view: Droplets with CPU, memory and disk usage bars">
+    <picture>
+      <source srcset="assets/list.webp" type="image/webp">
+      <img src="assets/list.png" width="1894" height="1156" fetchpriority="high" decoding="async" alt="Sailor list view: Droplets with CPU, memory and disk usage bars">
+    </picture>
   </div>
 
   <section id="features">
     <h2><span class="hash">#</span>Features</h2>
-    <p class="lead">Everything you reach for when checking on a fleet — without opening a browser.</p>
+    <p class="lead">The things you open the DigitalOcean console for, without leaving your terminal.</p>
     <div class="grid">
-      <div class="card"><h3><em>▸</em> Live metrics</h3><p>CPU, memory and disk per Droplet with colored threshold bars that turn yellow → orange → red as load climbs.</p></div>
-      <div class="card"><h3><em>▸</em> Search &amp; sort</h3><p>Substring name filter and sort by any metric. The cursor stays pinned to its Droplet as rows re-sort live.</p></div>
-      <div class="card"><h3><em>▸</em> Drill-down charts</h3><p>Expand any Droplet into stacked CPU/mem/disk time-series over a 1h / 6h / 24h window.</p></div>
-      <div class="card"><h3><em>▸</em> One-key SSH</h3><p>Hand off to your system <code>ssh</code> for a real shell. The user and key are remembered per Droplet.</p></div>
-      <div class="card"><h3><em>▸</em> SCP upload</h3><p>Pick local files/folders in a multi-select browser and send them to the Droplet's home directory, with a live progress bar.</p></div>
-      <div class="card"><h3><em>▸</em> Rate-limit aware</h3><p>A cursor-windowed scheduler keeps Sailor under DigitalOcean's API limit on accounts of any size.</p></div>
-      <div class="card"><h3><em>▸</em> Instant launch</h3><p>The Droplet list is cached for a day, so the UI paints immediately while fresh data loads.</p></div>
+      <div class="card"><h3><em>▸</em> Live usage</h3><p>CPU, memory, and disk for every Droplet. The bars change color as load climbs, so a busy box is easy to spot.</p></div>
+      <div class="card"><h3><em>▸</em> Search &amp; sort</h3><p>Filter by name and sort by any metric. Your cursor sticks to the same Droplet while the list reorders around it.</p></div>
+      <div class="card"><h3><em>▸</em> Usage charts</h3><p>Open any Droplet to see its CPU, memory, and disk history over the last hour, six hours, or day.</p></div>
+      <div class="card"><h3><em>▸</em> SSH</h3><p>Press <code>s</code> and you're in a real shell — Sailor just runs your system <code>ssh</code>. Login details stick per Droplet.</p></div>
+      <div class="card"><h3><em>▸</em> SCP upload</h3><p>Pick files or folders in a small browser and send them to the Droplet's home directory. A progress bar tracks the transfer.</p></div>
+      <div class="card"><h3><em>▸</em> Kind to the rate limit</h3><p>Sailor only polls the Droplets near your cursor, so it stays under DigitalOcean's API cap — five Droplets or five hundred.</p></div>
+      <div class="card"><h3><em>▸</em> Quick to start</h3><p>The list is cached, so it shows up right away while fresh numbers load behind it.</p></div>
     </div>
     <div class="legend">
       <span><span class="sw" style="background:#3fb950"></span> &lt; 50%</span>
@@ -245,7 +253,10 @@ sailor</pre>
     <div class="term">
       <div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i>
         <span>sailor — expanded charts</span></div>
-      <img src="assets/detail.png" alt="Sailor expanded view: stacked CPU, memory and disk time-series charts">
+      <picture>
+        <source srcset="assets/detail.webp" type="image/webp">
+        <img src="assets/detail.png" width="1894" height="1156" loading="lazy" decoding="async" alt="Sailor expanded view: stacked CPU, memory and disk time-series charts">
+      </picture>
     </div>
     <h3 style="margin-top:30px">SSH</h3>
     <p style="color:var(--muted)">Press <kbd style="font-family:var(--mono)">s</kbd> to connect. The first time, a prompt asks for the login user
@@ -254,12 +265,12 @@ sailor</pre>
       Sailor execs your system <code>ssh</code>, inheriting your keys, agent and <code>~/.ssh/config</code>.</p>
 
     <h3 style="margin-top:30px">SCP upload</h3>
-    <p style="color:var(--muted)">Press <kbd style="font-family:var(--mono)">u</kbd> to upload local files or folders to a Droplet's home
-      directory. A terminal file browser opens at your current directory — <kbd style="font-family:var(--mono)">l</kbd>/<kbd style="font-family:var(--mono)">h</kbd>
-      navigate in and out of folders, <kbd style="font-family:var(--mono)">space</kbd> checks items across directories,
-      <kbd style="font-family:var(--mono)">/</kbd> filters, <kbd style="font-family:var(--mono)">.</kbd> toggles hidden files — then
-      <kbd style="font-family:var(--mono)">enter</kbd> sends everything selected, with a live progress bar. Selecting a folder
-      subsumes anything checked inside it. The upload reuses the saved SSH login and runs your system <code>scp</code>.</p>
+    <p style="color:var(--muted)">Press <kbd style="font-family:var(--mono)">u</kbd> to send local files or folders up to a Droplet.
+      A file browser opens where you started Sailor: <kbd style="font-family:var(--mono)">l</kbd> and <kbd style="font-family:var(--mono)">h</kbd>
+      move in and out of folders, <kbd style="font-family:var(--mono)">space</kbd> checks the things you want (from more than
+      one folder if you like), and <kbd style="font-family:var(--mono)">enter</kbd> uploads them to the home directory while a
+      progress bar tracks it. Check a folder and something inside it, and Sailor just sends the folder. It reuses your saved
+      SSH login and runs your system <code>scp</code>.</p>
   </section>
 
   <section id="refresh">
